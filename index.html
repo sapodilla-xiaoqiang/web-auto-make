@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>后台测试</title>
+    <script src="jquery/3.2.1/jquery.min.js"></script>
+    <link href="jquery-ui-1.12.1.custom/jquery-ui.css">
+    <script src="jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+
+    <style>
+        #draggable {
+            width: 16em;
+            padding: 0 1em;
+        }
+
+        #draggable ul li {
+            margin: 1em 0;
+            padding: 0.5em 0;
+        }
+
+        * html #draggable ul li {
+            height: 1%;
+        }
+
+        #draggable ul li span.ui-icon {
+            float: left;
+        }
+
+        #draggable ul li span.count {
+            font-weight: bold;
+        }
+    </style>
+    <script type="text/javascript">
+        var mZindex = 0;
+        var mCurrID = "";
+        $(function () {
+
+            $("#btn1").draggable({
+                start: function () {
+                    console.log("start");
+                    setStart(this);
+                },
+                drag: function () {
+                    console.log(456);
+                },
+                stop: function () {
+                    setStop(this);
+                }
+            });
+
+            $("#btn2").draggable({
+                start: function () {
+                    console.log("start");
+                    setStart(this);
+                },
+                drag: function () {
+                    console.log(456);
+                },
+                stop: function () {
+                    console.log(789);
+                }
+            });
+
+
+        });
+
+        function setStart(mThis) {
+            mZindex++;
+            $(mThis).css(
+                {
+                    zIndex: mZindex
+                }
+            );
+            mCurrID = $(mThis).attr("id");
+        }
+
+        function setStop(mThis) {
+            var Y = $(mThis).offset().top;
+            var X = $(mThis).offset().left;
+            var w = $(mThis).width();
+            var h = $(mThis).height();
+            $("#mWidth").val(w);
+            $("#mHeight").val(h);
+            $("#mX").val(X);
+            $("#mY").val(Y);
+            console.log(X + "---" + Y);
+        }
+
+        function setAttr() {
+            var jID = "#" + mCurrID;
+            var mWidth = $("#mWidth").val() + "px";
+            var mHeight = $("#mHeight").val() + "px";
+            var mX = $("#mX").val() + "px";
+            var mY = $("#mY").val() + "px";
+            $(jID).css(
+                {
+                    width: mWidth,
+                    height: mHeight,
+                    left: mX,
+                    top: mY
+                }
+            )
+        }
+
+        function setOnChange(mThis) {
+            var mVal = $(mThis).val() + "px";
+            var action = $(mThis).attr("a");
+            var currID = "#" + mCurrID;
+            var mAttStr = "";
+            switch (action) {
+                case "x":
+                    $(currID).css(
+                        {
+                            left: mVal
+                        }
+                    )
+                    break;
+                case "y":
+                    $(currID).css(
+                        {
+                            top: mVal
+                        }
+                    )
+                    break;
+                case "w":
+                    $(currID).css(
+                        {
+                            width: mVal
+                        }
+                    )
+                    break;
+                case "h":
+                    $(currID).css(
+                        {
+                            height: mVal
+                        }
+                    )
+                    break;
+            }
+
+            console.log("12312" + mThis);
+        }
+    </script>
+</head>
+<body>
+
+<div id="btn1" class="ui-widget-content" style="position:absolute;width: 174px;
+        height: 64px;background: url('./img/btn.png') no-repeat;
+        z-index: 1;text-align: center;line-height: 64px;color: white">
+    科室选择
+</div>
+
+<div id="btn2" class="ui-widget-content" style="width: 100px;height: 100px;background: black">
+    <div>万能</div>
+</div>
+
+<div style="position:absolute;left:200px;top:0px;width: 644px;height: 530px;background: #003eff">
+
+</div>
+
+<div id="set" curID=""
+     style="left: 900px;top: 0px;width: 300px;height: 600px;background: rebeccapurple;position: absolute">
+    宽度设置：<input id="mWidth" a="w" type="number" oninput="setOnChange(this)"><br/>
+    高度设置：<input id="mHeight" a="h" oninput="setOnChange(this)" type="number"><br/>
+    X：<input id="mX" type="number" a="x" oninput="setOnChange(this)"><br/>
+    Y：<input id="mY" type="number" a="y" oninput="setOnChange(this)"><br/>
+    <input type="button" value="保存" onclick="setAttr()">
+</div>
+
+</body>
+</html>

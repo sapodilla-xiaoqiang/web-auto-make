@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>后台测试</title>
+    <script src="/Public/jquery/3.2.1/jquery.min.js"></script>
+    <link href="/Public/jquery-ui-1.12.1.custom/jquery-ui.css">
+    <script src="/Public/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+
+    <style>
+
+    </style>
+
+    <script>
+        //页面移动相关代码
+        var mZindex = 0;
+        var mCurrID = "";
+
+        // function startClone(mThis) {
+        //     var a = mThis.cloneNode(true);
+        //     a.setAttribute("id", "mTest");
+        //     registerDraggable("mTest");
+        //     $("#lm-canvas").append(a);
+        // }
+
+        function registerDraggable(id) {
+            var jId = "#" + id;
+            $(jId).draggable({
+                start: function () {
+                    console.log("start");
+                    setStart(this);
+                },
+                drag: function () {
+                    console.log(456);
+                },
+                stop: function () {
+                    setStop(this);
+                }
+            });
+        }
+
+        //移动元素开始
+        function setStart(mThis) {
+            mZindex++;
+            $(mThis).css(
+                {
+                    zIndex: mZindex
+                }
+            );
+            mCurrID = $(mThis).attr("id");
+            var isFirst = mThis.getAttribute("isFirst");
+
+
+            if (isFirst !== "false") {
+
+                var eleID = guid();
+                var a = mThis.cloneNode(true);
+                $("#res-pannel").append(a);
+                a.setAttribute("id", eleID);
+                a.setAttribute("isFirst", true);
+                registerDraggable(eleID);
+            }
+
+            // var a=mThis.cloneNode(true);
+            // $("body").prend
+            // var b=123;
+
+            function guid() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+        }
+
+        //元素移动结束
+        function setStop(mThis) {
+            var Y = $(mThis).offset().top;
+            var X = $(mThis).offset().left - 200;
+            var w = $(mThis).width();
+            var h = $(mThis).height();
+            $("#mWidth").val(w);
+            $("#mHeight").val(h);
+            $("#mX").val(X);
+            $("#mY").val(Y);
+            console.log(X + "---" + Y);
+            mThis.setAttribute("isFirst", false);
+            var currID = "#" + mThis.id;
+            $(currID).css(
+                {
+                    left: X
+                }
+            )
+            $("#lm-canvas").append(mThis);
+        }
+
+        //右侧设置元素的位置信息
+        function setOnChange(mThis) {
+            var mVal = $(mThis).val() + "px";
+            var action = $(mThis).attr("a");
+            var currID = "#" + mCurrID;
+            var mAttStr = "";
+            switch (action) {
+                case "x":
+                    $(currID).css(
+                        {
+                            left: mVal
+                        }
+                    )
+                    break;
+                case "y":
+                    $(currID).css(
+                        {
+                            top: mVal
+                        }
+                    )
+                    break;
+                case "w":
+                    $(currID).css(
+                        {
+                            width: mVal
+                        }
+                    )
+                    break;
+                case "h":
+                    $(currID).css(
+                        {
+                            height: mVal
+                        }
+                    )
+                    break;
+            }
+
+            console.log("12312" + mThis);
+        }
+
+
+        //设置当前页面的背景图片
+        function setBg(mThis) {
+            var a = "url('" + this.src + "')";
+            $("#lm-canvas").css(
+                {
+                    backgroundImage: a
+                }
+            )
+        }
+
+        function publish(mThis) {
+            var e = $("#publish").html();
+            var b = 123;
+        }
+
+
+    </script>
+
+
+    <script type="text/javascript">
+
+        $(function () {
+            registerDraggable("btn1");
+        });
+
+    </script>
+
+    <script>
+        function uploadAjax() {
+            var fileObj = document.getElementById("FileUpload").files[0]; // js 获取文件对象
+            if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
+                alert("请选择图片");
+                return;
+            }
+            var formFile = new FormData();
+            formFile.append("action", "UploadVMKImagePath");
+            formFile.append("file", fileObj); //加入文件对象
+
+            var data = formFile;
+            $.ajax({
+                url: "/index.php?m=Home&c=File&a=upload",
+                data: data,
+                type: "post",
+                dataType: "json",
+                cache: false,//上传文件无需缓存
+                processData: false,//用于对data参数进行序列化处理 这里必须false
+                contentType: false, //必须
+                success: function (data) {
+                    var dataObj = JSON.parse(data);
+                    if (dataObj.result == 0) {
+                        var tempImgStr = dataObj.img_path;
+                        var eleImg = document.createElement("img");
+                        eleImg.onclick = setBg;
+                        eleImg.setAttribute("src", tempImgStr);
+                        eleImg.style.width = "100px";
+                        eleImg.style.height = "100px";
+                        $("#showImg").append(eleImg);
+                    } else {
+                        alert(dataObj.msg);
+                    }
+                },
+            })
+        }
+
+
+        function whichButton(event) {
+            var btnNum = event.button;
+            if (btnNum == 2) {
+                alert("需要处理删除元素这类操作！")
+            }
+        }
+
+    </script>
+
+
+<body>
+
+
+<div id="res-pannel">
+    <div id="btn1" class="ui-widget-content" style="position:absolute;width: 174px;
+        height: 64px;background: url('/Public/img/sd/homebg644.png') no-repeat;
+        z-index: 1;text-align: center;line-height: 64px;color: white" onmousedown="whichButton(event)">
+        科室选择
+    </div>
+</div>
+
+
+<div style="position:absolute;left: 0px;top: 300px;width: 200px;height: 200px;background: rebeccapurple">
+    　　<input type="file" name="FileUpload" id="FileUpload"/> <br>
+    　　<input type="submit" value="上传" onclick="uploadAjax()"/>
+    <div id="showImg"></div>
+</div>
+
+
+<div id="publish">
+    <div id="lm-canvas" style="position:absolute;left:200px;top:0px;width: 644px;height: 530px;background: #003eff">
+
+    </div>
+</div>
+
+
+<div id="set" curID=""
+     style="left: 900px;top: 0px;width: 300px;height: 600px;background: rebeccapurple;position: absolute">
+    宽度设置：<input id="mWidth" a="w" type="number" oninput="setOnChange(this)"><br/>
+    高度设置：<input id="mHeight" a="h" oninput="setOnChange(this)" type="number"><br/>
+    X：<input id="mX" type="number" a="x" oninput="setOnChange(this)"><br/>
+    Y：<input id="mY" type="number" a="y" oninput="setOnChange(this)"><br/>
+    <input type="button" value="发布" onclick="publish()">
+</div>
+
+</body>
+</html>
