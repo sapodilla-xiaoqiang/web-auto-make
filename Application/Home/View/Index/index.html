@@ -4,8 +4,11 @@
     <meta charset="utf-8">
     <title>后台测试</title>
     <script src="/Public/jquery/3.2.1/jquery.min.js"></script>
-    <link href="/Public/jquery-ui-1.12.1.custom/jquery-ui.css">
+    <link rel="stylesheet" href="/Public/jquery-ui-1.12.1.custom/jquery-ui.css">
     <script src="/Public/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+
+    <link rel="stylesheet" href="/Public/bootstrap-3.3.7/dist/css/bootstrap.css">
+    <script src="/Public/bootstrap-3.3.7/dist/js/bootstrap.js"></script>
 
     <style>
 
@@ -16,18 +19,15 @@
         var mZindex = 0;
         var mCurrID = "";
 
-        // function startClone(mThis) {
-        //     var a = mThis.cloneNode(true);
-        //     a.setAttribute("id", "mTest");
-        //     registerDraggable("mTest");
-        //     $("#lm-canvas").append(a);
-        // }
+        var buttons = [];
+
 
         function registerDraggable(id) {
             var jId = "#" + id;
+
             $(jId).draggable({
                 start: function () {
-                    console.log("start");
+                    console.log("start=id=" + id);
                     setStart(this);
                 },
                 drag: function () {
@@ -54,16 +54,54 @@
             if (isFirst !== "false") {
 
                 var eleID = guid();
-                var a = mThis.cloneNode(true);
-                $("#res-pannel").append(a);
+                console.log("----->eleId=" + eleID);
+                var a = mThis.cloneNode(true);//拖拽走了第一个初始化对象，需要克隆一个对象保存在本地继续使用
+                var currId = a.getAttribute("id");
+                eleID = "btn" + (parseInt(currId.substring(3, 999)) + 1);
                 a.setAttribute("id", eleID);
                 a.setAttribute("isFirst", true);
+                $("#res-pannel").append(a);
                 registerDraggable(eleID);
-            }
+                console.log("----->eleId2=" + eleID);
+                var itemButton =
+                    {
+                        id: mThis.getAttribute("id"),
+                        name: "按键A",
+                        type: 'img',
+                        nextFocusLeft: '',
+                        nextFocusRight: '',
+                        nextFocusUp: '',
+                        nextFocusDown: '',
+                        focusable: true,
+                        backgroundImage: "__ROOT__/Public/img/about.png",
+                        focusImage: "__ROOT__/Public/img/about_box.png",
+                        bigImg: "",
+                        click: "",
+                        moveChange: "",
+                        focusChange: ""
+                    };
+                buttons.push(itemButton);
+                var testEle = document.createElement("option");
+                testEle.setAttribute("value", mThis.getAttribute("id"));
+                testEle.innerHTML = mThis.getAttribute("id");
+                $("#btn-nextFocusLeft").append(testEle);
 
-            // var a=mThis.cloneNode(true);
-            // $("body").prend
-            // var b=123;
+                var rightEle = document.createElement("option");
+                rightEle.setAttribute("value", mThis.getAttribute("id"));
+                rightEle.innerHTML = mThis.getAttribute("id");
+                $("#btn-nextFocusRight").append(rightEle);
+
+                var upEle = document.createElement("option");
+                upEle.setAttribute("value", mThis.getAttribute("id"));
+                upEle.innerHTML = mThis.getAttribute("id");
+                $("#btn-nextFocusUp").append(upEle);
+                var downEle = document.createElement("option");
+                downEle.setAttribute("value", mThis.getAttribute("id"));
+                downEle.innerHTML = mThis.getAttribute("id");
+                $("#btn-nextFocusDown").append(downEle);
+                // btn-nextFocusLeft-test
+
+            }
 
             function guid() {
                 return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -79,12 +117,15 @@
             var X = $(mThis).offset().left - 200;
             var w = $(mThis).width();
             var h = $(mThis).height();
+            var z = $(mThis).css("z-index");
             $("#mWidth").val(w);
             $("#mHeight").val(h);
             $("#mX").val(X);
             $("#mY").val(Y);
+            $("#mZ").val(z);
             console.log(X + "---" + Y);
             mThis.setAttribute("isFirst", false);
+            mThis.setAttribute("onclick", "btnClick(this)");
             var currID = "#" + mThis.id;
             $(currID).css(
                 {
@@ -92,6 +133,68 @@
                 }
             )
             $("#lm-canvas").append(mThis);
+            // btnSetById(mThis.id);
+        }
+
+        //界面元素点击事件
+        function btnClick(mThis) {
+            for (var i = 0; i < buttons.length; i++) {
+                var itemBtn = buttons[i];
+                if (itemBtn.id === mThis.id) {
+                    $("#btn-id").val(itemBtn.id);
+                    $("#btn-name").val(itemBtn.name);
+                    $("#btn-type").val(itemBtn.type);
+                    $("#btn-nextFocusLeft").val(itemBtn.nextFocusLeft);
+                    $("#btn-nextFocusRight").val(itemBtn.nextFocusRight);
+                    $("#btn-nextFocusUp").val(itemBtn.nextFocusUp);
+                    $("#btn-nextFocusDown").val(itemBtn.nextFocusDown);
+                    $("#btn-focusable").val(itemBtn.focusable);
+                    $("#btn-backgroundImage").attr("src", itemBtn.backgroundImage);
+                    $("#btn-focusImage").attr("src", itemBtn.focusImage);
+                    $("#btn-click").val(itemBtn.click);
+                    $("#btn-focusChange").val(itemBtn.focusChange);
+                }
+            }
+        }
+
+        function btnSetById(btnId) {
+            for (var i = 0; i < buttons.length; i++) {
+                if (buttons[i].id === btnId) {
+                    buttons[i].id = $("#btn-id").val();
+                    buttons[i].name = $("#btn-name").val();
+                    buttons[i].type = $("#btn-type").val();
+                    buttons[i].nextFocusLeft = $("#btn-nextFocusLeft option:selected").val();
+                    buttons[i].nextFocusRight = $("#btn-nextFocusRight option:selected").val();
+                    buttons[i].nextFocusUp = $("#btn-nextFocusUp option:selected").val();
+                    buttons[i].nextFocusDown = $("#btn-nextFocusDown option:selected").val();
+                    buttons[i].focusable = $("#btn-focusable").val();
+                    buttons[i].backgroundImage = $("#btn-backgroundImage").attr("src");
+                    buttons[i].focusImage = $("#btn-focusImage").attr("src");
+                    buttons[i].click = $("#btn-click").val();
+                    buttons[i].focusChange = $("#btn-focusChange").val();
+
+                }
+            }
+        }
+
+        function btnSet() {
+            for (var i = 0; i < buttons.length; i++) {
+                if (buttons[i].id === $("#btn-id").val()) {
+                    buttons[i].id = $("#btn-id").val();
+                    buttons[i].name = $("#btn-name").val();
+                    buttons[i].type = $("#btn-type").val();
+                    buttons[i].nextFocusLeft = $("#btn-nextFocusLeft option:selected").val();
+                    buttons[i].nextFocusRight = $("#btn-nextFocusRight option:selected").val();
+                    buttons[i].nextFocusUp = $("#btn-nextFocusUp option:selected").val();
+                    buttons[i].nextFocusDown = $("#btn-nextFocusDown option:selected").val();
+                    buttons[i].focusable = $("#btn-focusable").val();
+                    buttons[i].backgroundImage = $("#btn-backgroundImage").attr("src");
+                    buttons[i].focusImage = $("#btn-focusImage").attr("src");
+                    buttons[i].click = $("#btn-click").val();
+                    buttons[i].focusChange = $("#btn-focusChange").val();
+
+                }
+            }
         }
 
         //右侧设置元素的位置信息
@@ -130,8 +233,6 @@
                     )
                     break;
             }
-
-            console.log("12312" + mThis);
         }
 
 
@@ -147,7 +248,18 @@
 
         function publish(mThis) {
             var e = $("#publish").html();
-            var b = 123;
+            var data = {
+                "htmlContent": e,
+                "button": JSON.stringify(buttons)
+            };
+            $.post({
+                url: "/index.php?m=Home&c=Publish&a=index",
+                data: data,
+                success: function (data) {
+                    window.open(data);
+                }
+            });
+
         }
 
 
@@ -203,8 +315,12 @@
         function whichButton(event) {
             var btnNum = event.button;
             if (btnNum == 2) {
-                alert("需要处理删除元素这类操作！")
+                alert("需要处理删除元素这类操作！");
             }
+        }
+
+        function setFocusImg(mThis) {
+
         }
 
     </script>
@@ -214,11 +330,8 @@
 
 
 <div id="res-pannel">
-    <div id="btn1" class="ui-widget-content" style="position:absolute;width: 174px;
-        height: 64px;background: url('/Public/img/sd/homebg644.png') no-repeat;
-        z-index: 1;text-align: center;line-height: 64px;color: white" onmousedown="whichButton(event)">
-        科室选择
-    </div>
+    <img id="btn1" src="/Public/img/about.png" class="ui-widget-content" style="position:absolute;width: 174px;
+        z-index: 1;text-align: center;line-height: 64px;color: white" onmousedown="whichButton(event)"/>
 </div>
 
 
@@ -229,20 +342,47 @@
 </div>
 
 
-<div id="publish">
-    <div id="lm-canvas" style="position:absolute;left:200px;top:0px;width: 644px;height: 530px;background: #003eff">
+<div id="publish" style="position:absolute;left:200px;top:0px;width: 644px;height: 530px;background: #003eff">
+    <div id="lm-canvas" style="position:absolute;left: 0;top:0;background: #003eff;width: 644px;height: 530px;">
 
     </div>
 </div>
 
 
 <div id="set" curID=""
-     style="left: 900px;top: 0px;width: 300px;height: 600px;background: rebeccapurple;position: absolute">
+     style="left: 900px;top: 0px;width: 400px;height: 600px;background: rebeccapurple;position: absolute">
     宽度设置：<input id="mWidth" a="w" type="number" oninput="setOnChange(this)"><br/>
     高度设置：<input id="mHeight" a="h" oninput="setOnChange(this)" type="number"><br/>
     X：<input id="mX" type="number" a="x" oninput="setOnChange(this)"><br/>
     Y：<input id="mY" type="number" a="y" oninput="setOnChange(this)"><br/>
+    当前Z轴方向:<input id="mZ" type="number" a="z" oninput="setOnChange(this)"><br/>
     <input type="button" value="发布" onclick="publish()">
+
+    <br/><br/><br/>
+    Button对象属性设置:<br/>
+    按钮ID:&nbsp;<input id="btn-id"><br/>
+    按钮名称:<input id="btn-name"><br/>
+    按钮类型:<input id="btn-type"><br/>
+    按钮左移ID:<select id="btn-nextFocusLeft">
+    <option value=""></option>
+</select><br/>
+    按钮右移ID:<select id="btn-nextFocusRight">
+    <option value=""></option>
+</select><br/>
+    按钮上移ID:<select id="btn-nextFocusUp">
+    <option value=""></option>
+</select><br/>
+    按钮下移ID:<select id="btn-nextFocusDown">
+    <option value=""></option>
+</select><br/>
+    按钮是否获取焦点:<input id="btn-focusable"><br/>
+    按钮默认背景图片:<img id="btn-backgroundImage" src="" style="width: 40px;height: 40px;"> <br/>
+    按钮获取焦点图片:<img id="btn-focusImage" src="" src="" style="width: 40px;height: 40px;">
+    <input type="file" id="focusImage" value="123"><br/>
+    按钮的点击事件:<input id="btn-click"><br/>
+    按钮获取焦点事件:<input id="btn-focusChange"><br/>
+    <input type="button" value="设置" onclick="btnSet()"/>
+
 </div>
 
 </body>

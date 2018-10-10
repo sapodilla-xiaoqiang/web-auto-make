@@ -70,6 +70,7 @@ class FileController extends Controller
 
         //判断是否上传成功
         if (is_uploaded_file($fileinfo['tmp_name'])) {
+            is_dir($path) OR mkdir($path, 0777, true);
             if (move_uploaded_file($fileinfo['tmp_name'], $path . $newname)) {
                 $name = "/Public/img/sd/" . $newname;
                 $reArr = array(
